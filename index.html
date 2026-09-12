@@ -691,19 +691,46 @@ function submit(){
       .withFailureHandler(function(e){ fail('บันทึกไม่สำเร็จ: '+(e && e.message ? e.message : e)); })
       .submitExpense(payload);
   } else if(API_URL){
-    fetch(API_URL, { method:'POST', body: JSON.stringify(payload), redirect:'follow' })
-      .then(function(r){ return r.text(); })
-      .then(function(t){
-        var res;
-        try { res = JSON.parse(t); }
-        catch(e){ return fail('เซิร์ฟเวอร์ตอบกลับผิดรูปแบบ ลองกดบันทึกใหม่อีกครั้ง'); }
-        onDone(res);
-      })
-      .catch(function(e){ fail('ส่งข้อมูลไม่สำเร็จ: '+(e && e.message ? e.message : e)+' — เช็คเน็ตแล้วลองใหม่'); });
+    postViaIframe(payload);
   } else {
     fail('ยังไม่ได้ตั้งค่า API_URL ในไฟล์ index.html');
   }
 }
+/* ส่งข้อมูลด้วย hidden form + iframe แล้วรอคำตอบผ่าน postMessage
+   วิธีนี้ไม่ติด CORS จึงใช้ได้เมื่อฟอร์มถูกโฮสต์คนละโดเมนกับ Apps Script */
+function postViaIframe(payload){
+  var name = 'gsFrame' + Date.now();
+  var frame = document.createElement('iframe');
+  frame.name = name; frame.style.display = 'none';
+  document.body.appendChild(frame);
+
+  var form = document.createElement('form');
+  form.action = API_URL; form.method = 'POST'; form.target = name; form.style.display='none';
+  var ta = document.createElement('textarea'); ta.name = 'payload'; ta.value = JSON.stringify(payload);
+  var md = document.createElement('input');   md.name = 'mode';    md.value = 'iframe';
+  form.appendChild(ta); form.appendChild(md);
+  document.body.appendChild(form);
+
+  var finished = false;
+  function cleanup(){
+    window.removeEventListener('message', onMsg);
+    try{ frame.parentNode.removeChild(frame); form.parentNode.removeChild(form); }catch(e){}
+  }
+  function onMsg(ev){
+    var d = ev.data;
+    if(!d || typeof d !== 'object' || d.__expense !== true) return;
+    finished = true; cleanup(); onDone(d.res);
+  }
+  window.addEventListener('message', onMsg);
+  form.submit();
+
+  setTimeout(function(){
+    if(finished) return;
+    cleanup();
+    fail('ไม่ได้รับคำตอบจากเซิร์ฟเวอร์ภายใน 3 นาที — เช็คก่อนว่ากด Deploy เวอร์ชันใหม่แล้ว และลองเปิดชีทดูว่าข้อมูลเข้าไปหรือยัง ก่อนกดบันทึกซ้ำ');
+  }, 180000);
+}
+
 function onDone(res){
   $('load').classList.remove('on');
   $('submitBtn').disabled=false;
