@@ -45,6 +45,10 @@ body{
 
 /* ---------- sheet ---------- */
 .ptitle{margin:4px 2px 4px;font-size:24px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.toplinks{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.toplinks a{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--brand);text-decoration:none;border:1px solid var(--rule);background:#fff;border-radius:999px;padding:6px 12px}
+.toplinks a:hover{border-color:var(--brand);background:var(--tint)}
+.toplinks svg{width:14px;height:14px;flex:none}
 .reqbar{background:#E4EEFF;color:#1F3C8F;border-radius:9px;padding:11px 14px;font-size:13.5px;margin:0 0 14px;line-height:1.5}
 .lede{margin:0 2px 14px;font-size:13px;color:var(--ink-2);max-width:56ch;line-height:1.5}
 .sheet{
@@ -227,6 +231,25 @@ footer{text-align:center;color:var(--ink-3);font-size:11.5px;padding:20px 0 8px}
 .modal h3{margin:0 0 4px;font-size:17px}
 .modal .sub{font-size:13px;color:var(--ink-2);margin:0 0 14px}
 .modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+.tab{font-size:13.5px;padding:10px 4px}
+.modal .box{max-height:92vh;overflow:auto}
+.mini-drop{border:1px dashed var(--rule);border-radius:8px;padding:11px;text-align:center;font-size:13px;color:var(--ink-2);cursor:pointer;background:#FCFDFC}
+.mini-drop:hover{border-color:var(--brand);background:var(--tint)}
+.tag{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:999px;margin-right:4px}
+.tag-miss{background:#FBEFEE;color:var(--danger);font-weight:500}
+.tag-ok{background:#E8F5EC;color:#0E6A3C}
+.tag-wait{background:#FFF4DC;color:#8A5A00}
+.sumrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 14px}
+.sumbox{background:#fff;border:1px solid var(--rule);border-radius:9px;padding:10px 12px}
+.sumbox .k{font-size:11.5px;color:var(--ink-3)}
+.sumbox .v{font-family:"IBM Plex Mono",monospace;font-size:20px;font-weight:600;line-height:1.2}
+.sumbox.bad .v{color:var(--danger)}
+.sec-h{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--ink-2)}
+.warn{background:#FFF4DC;color:#8A5A00;border:1px solid #F3E2B5;border-radius:8px;padding:10px 12px;font-size:13.5px;margin:12px 0 0;text-align:left}
+.btn.line{background:#06C755;color:#fff}
+.btn.line:hover{opacity:.92}
+.share-row{display:flex;gap:9px;margin:18px 0 10px}
+.share-row .btn{flex:1}
 .hide{display:none!important}
 </style>
 </head>
@@ -236,10 +259,17 @@ footer{text-align:center;color:var(--ink-3);font-size:11.5px;padding:20px 0 8px}
 
   <!-- ============ FORM ============ -->
   <h1 class="ptitle">ค่าใช้จ่าย</h1>
+  <div class="toplinks">
+    <a href="https://docs.google.com/spreadsheets/d/1BlUukvECfp7sC1LUByBqKXAdIj1XHzAIf11yifuP-qY/edit?gid=1665718838#gid=1665718838" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>ชีทสรุป</a>
+    <a href="https://drive.google.com/drive/folders/1E1F9TLoEKUTQ8shOaIwG1TRin_Hz8tV9" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>รูป · PDF</a>
+  </div>
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" data-t="record" aria-selected="true">บันทึกค่าใช้จ่าย</button>
-    <button class="tab" role="tab" data-t="request" aria-selected="false">ขอเบิกล่วงหน้า</button>
-    <button class="tab" role="tab" data-t="list" aria-selected="false">ติดตามสถานะ</button>
+    <button class="tab" role="tab" data-t="record" aria-selected="true">บันทึก</button>
+    <button class="tab" role="tab" data-t="request" aria-selected="false">ขอเบิก</button>
+    <button class="tab" role="tab" data-t="list" aria-selected="false">สถานะ</button>
+    <button class="tab" role="tab" data-t="audit" aria-selected="false">ตรวจเอกสาร</button>
   </div>
 
   <div id="formView">
@@ -302,6 +332,19 @@ footer{text-align:center;color:var(--ink-3);font-size:11.5px;padding:20px 0 8px}
             <select id="category"></select>
           </div>
           <div class="field">
+            <label for="docType">เอกสารที่ได้รับ <span class="req">*</span></label>
+            <select id="docType">
+              <option value="NONE">ไม่มีใบเสร็จ / ไม่ครบ → ออกใบรับรองแทน</option>
+              <option value="TAX_INVOICE">ใบกำกับภาษีเต็มรูป</option>
+              <option value="TAX_INVOICE_ABB">ใบกำกับภาษีอย่างย่อ</option>
+              <option value="RECEIPT">ใบเสร็จรับเงิน / บิลเงินสด (ไม่มี VAT)</option>
+              <option value="INVOICE">ใบแจ้งหนี้ / ใบวางบิล</option>
+            </select>
+            <div class="hint" id="docTypeHint">ระบบจะสร้าง PDF ใบรับรองแทนใบเสร็จรับเงินให้</div>
+          </div>
+        </div>
+        <div class="grid g2" id="reasonWrap">
+          <div class="field">
             <label for="reason">เหตุผลที่ไม่มีใบเสร็จ <span class="req">*</span></label>
             <select id="reason">
               <option value="ผู้รับเงินไม่มีใบเสร็จรับเงินให้">ผู้รับเงินไม่มีใบเสร็จรับเงินให้</option>
@@ -311,10 +354,20 @@ footer{text-align:center;color:var(--ink-3);font-size:11.5px;padding:20px 0 8px}
               <option value="__other">อื่น ๆ (ระบุเอง)</option>
             </select>
           </div>
+          <div class="field hide" id="reasonOtherWrap">
+            <label for="reasonOther">ระบุเหตุผล <span class="req">*</span></label>
+            <input id="reasonOther" placeholder="อธิบายสั้น ๆ" autocomplete="off">
+          </div>
         </div>
-        <div class="field hide" id="reasonOtherWrap">
-          <label for="reasonOther">ระบุเหตุผล <span class="req">*</span></label>
-          <input id="reasonOther" placeholder="อธิบายสั้น ๆ" autocomplete="off">
+        <div class="grid g2 hide" id="docRefWrap">
+          <div class="field">
+            <label for="docRefNo">เลขที่ใบเสร็จ / ใบกำกับภาษี</label>
+            <input id="docRefNo" placeholder="เช่น INV2026-00123" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="docRefDate">วันที่ในเอกสาร</label>
+            <input id="docRefDate" type="date">
+          </div>
         </div>
 
         <div class="field">
@@ -416,7 +469,7 @@ footer{text-align:center;color:var(--ink-3);font-size:11.5px;padding:20px 0 8px}
         <div class="step-h"><b>06</b><span>แนบหลักฐาน</span><small>ถ่ายจากมือถือได้เลย</small></div>
 
         <div class="field">
-          <label>บิล / ใบส่งของ / ใบกำกับภาษีที่ได้มา</label>
+          <label id="billLabel">บิล / ใบส่งของ / ใบกำกับภาษีที่ได้มา</label>
           <div class="drop" id="dropBill" tabindex="0" role="button">
             <div class="t">แตะเพื่อถ่ายรูปหรือเลือกไฟล์บิล</div>
             <div class="d">JPG, PNG หรือ PDF · เลือกได้หลายไฟล์</div>
@@ -429,7 +482,7 @@ footer{text-align:center;color:var(--ink-3);font-size:11.5px;padding:20px 0 8px}
           <label>สลิปโอนเงิน</label>
           <div class="drop" id="dropSlip" tabindex="0" role="button">
             <div class="t">แตะเพื่อแนบสลิปโอนเงิน</div>
-            <div class="d">ถ้าจ่ายเงินสด ข้ามได้ แต่ควรมีรูปเงินสด/ผู้รับเงินเซ็นรับ</div>
+            <div class="d">ยังไม่มีสลิปก็บันทึกได้ แล้วมาแนบทีหลังที่แท็บ "ตรวจเอกสาร"</div>
           </div>
           <input id="fileSlip" type="file" accept="image/*,application/pdf" multiple class="hide">
           <div class="thumbs" id="thumbsSlip"></div>
@@ -448,7 +501,10 @@ footer{text-align:center;color:var(--ink-3);font-size:11.5px;padding:20px 0 8px}
       <div class="stamp" id="rDoc">—</div>
       <h2 id="rAmount">0.00 บาท</h2>
       <div class="rco" id="headCo2"></div>
-      <p>ใบรับรองแทนใบเสร็จรับเงินถูกสร้างเป็น PDF แนบไฟล์เข้าโฟลเดอร์ของเดือนนี้ และเพิ่มบรรทัดในชีทสรุปแล้ว</p>
+      <p id="rNoCert" class="hide" style="margin-bottom:6px"><b>มีใบเสร็จ/ใบกำกับครบ</b> จึงไม่ได้ออกใบรับรองแทน</p>
+      <p>เก็บเอกสารเข้าโฟลเดอร์ของเดือนนี้ และเพิ่มบรรทัดในชีทสรุปแล้ว</p>
+      <div class="warn hide" id="rMissing"></div>
+      <div class="share-row"><button class="btn line" id="rShareLine">แชร์สรุปเข้าไลน์</button><button class="btn ghost" id="rCopy">คัดลอกข้อความ</button></div>
       <div class="links" id="rLinks"></div>
       <button class="btn ghost" id="againBtn" style="width:100%">กรอกใบใหม่</button>
     </div>
@@ -507,7 +563,8 @@ footer{text-align:center;color:var(--ink-3);font-size:11.5px;padding:20px 0 8px}
       <h2 id="rqAmt">0.00 บาท</h2>
       <div class="rco" id="rqCo"></div>
       <p>ส่งคำขอแล้ว รอผู้มีอำนาจอนุมัติ ติดตามได้ที่แท็บ "ติดตามสถานะ"</p>
-      <div class="links" style="margin-top:20px"><a href="#" id="rqGoList">ดูสถานะคำขอ<span>เปิด</span></a></div>
+      <div class="share-row" style="margin-top:20px"><button class="btn line" id="rqShareLine">แชร์คำขอเข้าไลน์</button></div>
+      <div class="links"><a href="#" id="rqGoList">ดูสถานะคำขอ<span>เปิด</span></a></div>
       <button class="btn ghost" id="rqAgain" style="width:100%">ยื่นคำขอใหม่</button>
     </div>
   </div>
@@ -525,6 +582,64 @@ footer{text-align:center;color:var(--ink-3);font-size:11.5px;padding:20px 0 8px}
     <div id="list"><div class="empty">กำลังโหลด…</div></div>
   </div>
 
+  <!-- ============ ตรวจเอกสาร ============ -->
+  <div id="auditView" class="hide">
+    <p class="lede">รายการที่บิลหรือสลิปยังไม่ครบ รายการที่รอเบิกคืน และคำขอเบิกที่ค้างอยู่ กด "แนบเพิ่ม" เพื่อเติมเอกสารให้ครบได้เลย</p>
+    <div class="sumrow" id="auditSum"></div>
+    <button class="refresh" id="auditRefresh">↻ ตรวจใหม่</button>
+    <div id="auditList"><div class="empty">กำลังตรวจ…</div></div>
+  </div>
+
+</div>
+
+<!-- modal บันทึกทันทีจากคำขอ -->
+<div class="modal" id="qmodal">
+  <div class="box">
+    <h3>บันทึกบัญชี + ออกใบรับรอง</h3>
+    <p class="sub" id="qSub"></p>
+    <div class="field"><label for="qName">ชื่อผู้บันทึก <span class="req">*</span></label><input id="qName" autocomplete="off"></div>
+    <div class="field"><label for="qDocType">เอกสารที่ได้รับ</label>
+      <select id="qDocType">
+        <option value="NONE">ไม่มีใบเสร็จ / ไม่ครบ → ออกใบรับรองแทน</option>
+        <option value="TAX_INVOICE">ใบกำกับภาษีเต็มรูป</option>
+        <option value="TAX_INVOICE_ABB">ใบกำกับภาษีอย่างย่อ</option>
+        <option value="RECEIPT">ใบเสร็จรับเงิน / บิลเงินสด</option>
+        <option value="INVOICE">ใบแจ้งหนี้ / ใบวางบิล</option>
+      </select></div>
+    <div class="field" id="qReasonWrap"><label for="qReason">เหตุผลที่ไม่มีใบเสร็จ</label>
+      <select id="qReason">
+        <option>ผู้รับเงินไม่มีใบเสร็จรับเงินให้</option>
+        <option>ผู้รับเงินไม่ยอมออกใบเสร็จรับเงิน</option>
+        <option>ใบเสร็จรับเงินไม่มีรายละเอียดครบถ้วน</option>
+        <option>ใบเสร็จรับเงินสูญหาย</option>
+      </select></div>
+    <div class="field"><label>บิล / ใบส่งของ (ถ้ามี)</label>
+      <div class="mini-drop" id="dropQBill" tabindex="0" role="button">แตะเพื่อแนบบิล</div>
+      <input id="fileQBill" type="file" accept="image/*,application/pdf" multiple class="hide"><div class="thumbs" id="thumbsQBill"></div></div>
+    <div class="field" id="qSlipWrap"><label>สลิปโอนเงิน <span id="qSlipHint" style="color:var(--ink-3)"></span></label>
+      <div class="mini-drop" id="dropQSlip" tabindex="0" role="button">แตะเพื่อแนบสลิป</div>
+      <input id="fileQSlip" type="file" accept="image/*,application/pdf" multiple class="hide"><div class="thumbs" id="thumbsQSlip"></div></div>
+    <div class="field"><label for="qNote">หมายเหตุเพิ่มเติม</label><input id="qNote" autocomplete="off"></div>
+    <div class="msg" id="qErr"></div>
+    <div class="row"><button class="btn ghost" id="qCancel">ยกเลิก</button><button class="btn" id="qOk">บันทึกและออกใบรับรอง</button></div>
+  </div>
+</div>
+
+<!-- modal แนบเอกสารเพิ่ม -->
+<div class="modal" id="amodal">
+  <div class="box">
+    <h3>แนบเอกสารเพิ่ม</h3>
+    <p class="sub" id="aSub"></p>
+    <div class="field"><label for="aName">ชื่อผู้แนบ</label><input id="aName" autocomplete="off"></div>
+    <div class="field" id="aBillWrap"><label>บิล / ใบส่งของ</label>
+      <div class="mini-drop" id="dropABill" tabindex="0" role="button">แตะเพื่อแนบบิล</div>
+      <input id="fileABill" type="file" accept="image/*,application/pdf" multiple class="hide"><div class="thumbs" id="thumbsABill"></div></div>
+    <div class="field"><label>สลิปโอนเงิน</label>
+      <div class="mini-drop" id="dropASlip" tabindex="0" role="button">แตะเพื่อแนบสลิป</div>
+      <input id="fileASlip" type="file" accept="image/*,application/pdf" multiple class="hide"><div class="thumbs" id="thumbsASlip"></div></div>
+    <div class="msg" id="aErr"></div>
+    <div class="row"><button class="btn ghost" id="aCancel">ยกเลิก</button><button class="btn" id="aOk">บันทึกไฟล์</button></div>
+  </div>
 </div>
 
 <!-- แถบล่างของหน้าขอเบิก -->
@@ -542,6 +657,9 @@ footer{text-align:center;color:var(--ink-3);font-size:11.5px;padding:20px 0 8px}
     <p class="sub" id="mSub"></p>
     <div class="field"><label for="mName">ชื่อผู้ดำเนินการ <span class="req">*</span></label><input id="mName" autocomplete="off"></div>
     <div class="field" id="mDateWrap"><label for="mDate">วันที่โอน</label><input id="mDate" type="date"></div>
+    <div class="field hide" id="mSlipWrap"><label>แนบสลิปโอนเงิน <span style="color:var(--ink-3)">(แนบตรงนี้ บัญชีจะไม่ต้องขอซ้ำ)</span></label>
+      <div class="mini-drop" id="dropMSlip" tabindex="0" role="button">แตะเพื่อถ่ายรูป / เลือกสลิป</div>
+      <input id="fileMSlip" type="file" accept="image/*,application/pdf" multiple class="hide"><div class="thumbs" id="thumbsMSlip"></div></div>
     <div class="field"><label for="mNote" id="mNoteLbl">หมายเหตุ</label><input id="mNote" autocomplete="off"></div>
     <div class="field"><label for="mPin">รหัส PIN <span class="req">*</span></label><input id="mPin" type="password" inputmode="numeric" autocomplete="off"></div>
     <div class="msg" id="mErr"></div>
@@ -583,7 +701,7 @@ var CATEGORIES = ['วัตถุดิบ / ผ้า-อะไหล่','ส
 
 /*__BOOT__*/
 
-var state = { company:'FORMKO', fund:'ADVANCE', bills:[], slips:[], rqFiles:[], filter:'ALL', rows:[], modal:null, tab:'record' };
+var state = { company:'FORMKO', fund:'ADVANCE', bills:[], slips:[], rqFiles:[], mSlips:[], qBills:[], qSlips:[], aBills:[], aSlips:[], filter:'ALL', rows:[], modal:null, tab:'record', audit:null };
 var STATUS = {
   WAIT:{label:'รออนุมัติ',cls:'st-wait'}, APPROVED:{label:'อนุมัติแล้ว · รอโอน',cls:'st-appr'},
   PAID:{label:'โอนแล้ว · รอบัญชีบันทึก',cls:'st-paid'}, DONE:{label:'บันทึกแล้ว',cls:'st-done'}, REJECTED:{label:'ไม่อนุมัติ',cls:'st-rej'}
@@ -780,8 +898,11 @@ function collect(){
   if(!$('payeeName').value.trim()) return fail('ใส่ชื่อผู้รับเงิน (ข้อ 03)');
   if(!items.length) return fail('ใส่รายการที่จ่ายอย่างน้อย 1 รายการ (ข้อ 04)');
   if(total<=0) return fail('ยอดรวมต้องมากกว่า 0');
-  var reason = $('reason').value==='__other' ? $('reasonOther').value.trim() : $('reason').value;
-  if(!reason) return fail('ระบุเหตุผลที่ไม่มีใบเสร็จ (ข้อ 04)');
+  var docType = $('docType').value;
+  var needCert = docType==='NONE';
+  var reason = needCert ? ($('reason').value==='__other' ? $('reasonOther').value.trim() : $('reason').value) : '';
+  if(needCert && !reason) return fail('ระบุเหตุผลที่ไม่มีใบเสร็จ (ข้อ 03)');
+  if(!needCert && !state.bills.length) return fail('เลือกว่ามีใบเสร็จ/ใบกำกับ แต่ยังไม่ได้แนบรูปเอกสาร (ข้อ 06)');
   if(state.fund==='ADVANCE' && !$('advPerson').value.trim()) return fail('ใส่ชื่อผู้สำรองจ่าย (ข้อ 05)');
   if(!state.bills.length && !state.slips.length) return fail('แนบบิลหรือสลิปอย่างน้อย 1 รูป (ข้อ 06)');
   return {
@@ -804,6 +925,10 @@ function collect(){
     total: total,
     totalText: bahtText(total),
     category: $('category').value,
+    docType: docType,
+    docTypeLabel: $('docType').options[$('docType').selectedIndex].text.replace(/ → .*$/,''),
+    docRefNo: $('docRefNo').value.trim(),
+    docRefDate: $('docRefDate').value,
     reason: reason,
     note: $('note').value.trim(),
     fundType: state.fund,
@@ -824,6 +949,7 @@ function submit(){
   $('loadT').textContent = 'กำลังอัปโหลดไฟล์';
   $('loadD').textContent = (payload.bills.length+payload.slips.length) + ' ไฟล์ · อย่าเพิ่งปิดหน้านี้';
 
+  lastRecord = payload;
   if(typeof google !== 'undefined' && google.script && google.script.run){
     google.script.run
       .withSuccessHandler(onDone)
@@ -878,6 +1004,15 @@ function onDone(res){
   $('headCo2').textContent = COMPANIES[state.company].name;
   $('rDoc').textContent = res.docNo;
   $('rAmount').textContent = money(res.total)+' บาท';
+  $('rNoCert').classList.toggle('hide', !!res.pdfUrl);
+  if(lastRecord){
+    lastRecord.docNo=res.docNo; lastRecord.pdfUrl=res.pdfUrl; lastRecord.total=res.total;
+    if(lastRecord.billCount===undefined) lastRecord.billCount=(lastRecord.bills||[]).length;
+    if(lastRecord.slipCount===undefined) lastRecord.slipCount=(lastRecord.slips||[]).length;
+  }
+  var w=$('rMissing');
+  if(res.missing && res.missing.length){ w.textContent='⚠ เอกสารยังไม่ครบ: ขาด'+res.missing.join(' และ ')+' — แนบเพิ่มทีหลังได้ที่แท็บ "ตรวจเอกสาร"'; w.classList.remove('hide'); }
+  else w.classList.add('hide');
   var L=$('rLinks'); L.innerHTML='';
   [['เปิดใบรับรอง (PDF)', res.pdfUrl],
    ['โฟลเดอร์เอกสารเดือนนี้', res.folderUrl],
@@ -893,7 +1028,7 @@ function onDone(res){
 }
 function resetForm(){
   ['payeeName','payeeTax','payeePhone','payeeAddr','note','advBank','payFrom','shipping','discount'].forEach(function(id){ $(id).value=''; });
-  $('vatMode').value='NONE';
+  $('vatMode').value='NONE'; $('docType').value='NONE'; $('docRefNo').value=''; $('docRefDate').value=''; syncDocType();
   state.bills=[]; state.slips=[];
   renderThumbs('bills','thumbsBill'); renderThumbs('slips','thumbsSlip');
   $('items').innerHTML=''; $('items').appendChild(itemRow()); calc();
@@ -935,7 +1070,9 @@ function showTab(t){
   $('rqDone').classList.add('hide');
   $('rqBarEl').classList.toggle('hide', t!=='request');
   $('listView').classList.toggle('hide', t!=='list');
+  $('auditView').classList.toggle('hide', t!=='audit');
   if(t==='list') loadList();
+  if(t==='audit') loadAudit();
   window.scrollTo(0,0);
 }
 
@@ -968,6 +1105,7 @@ function rqSubmitFn(){
     $('load').classList.remove('on'); $('rqSubmit').disabled=false;
     if(!res||!res.ok) return rqFail(res&&res.error?res.error:'ส่งไม่สำเร็จ');
     $('rqId').textContent=res.id; $('rqAmt').textContent=money(p.amount)+' บาท'; $('rqCo').textContent=COMPANIES[state.company].name;
+    p.id=res.id; lastRequest=p;
     $('rqView').classList.add('hide'); $('rqBarEl').classList.add('hide'); $('rqDone').classList.remove('hide'); window.scrollTo(0,0);
   }, rqFail);
 }
@@ -997,7 +1135,8 @@ function renderList(){
     meta.push('ยื่นเมื่อ '+thDate(r.createdAt)+(r.needBy?' · ต้องใช้ภายใน '+thDate(r.needBy):''));
     if(r.payee) meta.push('จ่ายให้ '+esc(r.payee)+(r.payeeBank?' · '+esc(r.payeeBank):''));
     if(r.approvedBy) meta.push((r.status==='REJECTED'?'ไม่อนุมัติโดย ':'อนุมัติโดย ')+esc(r.approvedBy)+' '+thDate(r.approvedAt)+(r.rejectReason?' — '+esc(r.rejectReason):''));
-    if(r.paidBy) meta.push('โอนโดย '+esc(r.paidBy)+' '+thDate(r.paidAt)+(r.paidNote?' — '+esc(r.paidNote):''));
+    if(r.paidBy) meta.push('โอนโดย '+esc(r.paidBy)+' '+thDate(r.paidAt)+(r.paidNote?' — '+esc(r.paidNote):'')+
+      (r.slipUrl ? ' · <a href="'+esc(r.slipUrl)+'" target="_blank" rel="noopener">สลิป ('+(r.slipList?r.slipList.length:1)+')</a>' : ' · <span class="tag tag-miss">ยังไม่มีสลิป</span>'));
     if(r.docNo) meta.push('บันทึกแล้ว เลขที่ '+esc(r.docNo));
     if(r.fileUrl) meta.push('<a href="'+esc(r.fileUrl)+'" target="_blank" rel="noopener">ดูไฟล์แนบ</a>');
     d.innerHTML=
@@ -1012,9 +1151,23 @@ function renderList(){
     } else if(r.status==='APPROVED'){
       acts.appendChild(mkBtn('โอนเงินแล้ว','btn ok',function(){ openModal('paid',r); }));
     } else if(r.status==='PAID'){
-      acts.appendChild(mkBtn('บันทึกบัญชี + ออกใบรับรอง','btn',function(){ startRecordFrom(r); }));
+      acts.appendChild(mkBtn('บันทึกทันที','btn ok',function(){ openQuick(r); }));
+      acts.appendChild(mkBtn('แก้ไขก่อนบันทึก','btn ghost',function(){ startRecordFrom(r); }));
     }
-    if(acts.children.length) d.appendChild(acts);
+    if((r.status==='PAID' || r.status==='DONE') && !r.slipUrl){
+      acts.appendChild(mkBtn('แนบสลิปที่ได้มาทีหลัง','btn ghost',function(){ openAttach({docNo:r.docNo, reqId:r.id, total:r.amount, payee:r.payee, missing:['สลิป'], slipOnly:true}); }));
+    }
+    acts.appendChild(mkBtn('แชร์ไลน์','btn line',function(){
+      var st2=STATUS[r.status]||{label:r.status};
+      var t=['📌 '+r.id+' · '+st2.label, (COMPANIES[r.company]||{}).short||r.company, r.reqName+' — '+r.purpose,
+        'จำนวน '+money(r.amount)+' บาท', 'จ่ายให้ '+r.payee+(r.payeeBank?' · '+r.payeeBank:'')];
+      if(r.approvedBy) t.push('อนุมัติโดย '+r.approvedBy+' '+thDate(r.approvedAt));
+      if(r.paidBy) t.push('โอนโดย '+r.paidBy+' '+thDate(r.paidAt)+(r.slipUrl?' · สลิป '+r.slipUrl:''));
+      if(r.docNo) t.push('บันทึกแล้ว เลขที่ '+r.docNo);
+      t.push(location.origin+location.pathname+'#list');
+      shareLine(t.join('\n'));
+    }));
+    d.appendChild(acts);
     $('list').appendChild(d);
   });
 }
@@ -1052,6 +1205,8 @@ function openModal(kind,r){
   $('mDateWrap').classList.toggle('hide', kind!=='paid');
   $('mNoteLbl').textContent= kind==='reject'?'เหตุผลที่ไม่อนุมัติ *':(kind==='paid'?'ส่งสลิปไว้ที่ไหน / หมายเหตุ':'หมายเหตุ');
   $('mNote').placeholder= kind==='paid'?'เช่น ส่งสลิปในไลน์กลุ่มบัญชีแล้ว':'';
+  $('mSlipWrap').classList.toggle('hide', kind!=='paid');
+  state.mSlips=[]; renderThumbs('mSlips','thumbsMSlip');
   $('mDate').value=todayISO(); $('mNote').value=''; $('mPin').value=''; $('mErr').className='msg';
   $('modal').classList.add('on'); $('mName').focus();
 }
@@ -1064,11 +1219,189 @@ function confirmModal(){
   if(!pin){ e.textContent='ใส่รหัส PIN'; e.className='msg err'; return; }
   if(m.kind==='reject' && !note){ e.textContent='ระบุเหตุผลที่ไม่อนุมัติ'; e.className='msg err'; return; }
   $('mOk').disabled=true;
-  post({action:m.kind, id:m.row.id, by:name, pin:pin, note:note, date:$('mDate').value}, function(res){
+  var files = m.kind==='paid' ? state.mSlips.map(function(f){ return {name:f.name,mime:f.mime,data:f.data}; }) : [];
+  if(m.kind==='paid' && !files.length && !note){ e.textContent='แนบสลิป หรือระบุในหมายเหตุว่าส่งสลิปไว้ที่ไหน'; e.className='msg err'; return; }
+  post({action:m.kind, id:m.row.id, by:name, pin:pin, note:note, date:$('mDate').value, files:files}, function(res){
     $('mOk').disabled=false;
     if(!res||!res.ok){ e.textContent=res&&res.error?res.error:'ไม่สำเร็จ'; e.className='msg err'; return; }
     closeModal(); loadList();
   }, function(msg){ $('mOk').disabled=false; e.textContent=msg; e.className='msg err'; });
+}
+
+/* ---------- แชร์เข้าไลน์ (LINE Share URL — ผู้ใช้เลือกกลุ่มเอง ไม่ต้องตั้ง token) ---------- */
+function shareLine(text){
+  var url = 'https://line.me/R/share?text=' + encodeURIComponent(text);
+  var a = document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove();
+}
+function copyText(text, btn){
+  var done=function(){ if(btn){ var t=btn.textContent; btn.textContent='คัดลอกแล้ว ✓'; setTimeout(function(){ btn.textContent=t; },1600); } };
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); }); }
+  else { fallbackCopy(text); done(); }
+}
+function fallbackCopy(text){ var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(e){} ta.remove(); }
+
+var lastRecord = null;   // เก็บข้อมูลใบล่าสุดไว้สร้างข้อความแชร์
+function recordSummaryText(){
+  var r = lastRecord; if(!r) return '';
+  var co = COMPANIES[r.company] || {};
+  var lines = [
+    '✅ บันทึกค่าใช้จ่าย ' + r.docNo,
+    (co.short || r.company) + ' · ' + thDate(r.expDate),
+    'จ่ายให้ ' + r.payeeName,
+    'รายการ ' + (r.items||[]).map(function(i){ return i.desc + (Number(i.qty)!==1 ? ' x'+i.qty : ''); }).join(', '),
+    'ยอดสุทธิ ' + money(r.total) + ' บาท',
+    'หมวด ' + r.category + ' · ' + (r.fundType==='ADVANCE' ? 'สำรองจ่ายโดย ' + (r.advPerson||'-') + ' (รอเบิกคืน)' : 'บริษัทจ่ายตรง' + (r.payMethod ? ' · ' + r.payMethod : '')),
+    'เอกสาร: ' + (r.docType && r.docType!=='NONE' ? r.docTypeLabel + (r.docRefNo ? ' เลขที่ '+r.docRefNo : '') : 'ใบรับรองแทนใบเสร็จ') +
+      ' · บิล ' + (r.billCount ? '✔ '+r.billCount : '✘') + ' · สลิป ' + (r.slipCount ? '✔ '+r.slipCount : '✘')
+  ];
+  if(r.reqId) lines.push('อ้างอิงคำขอ ' + r.reqId);
+  lines.push('บันทึกโดย ' + r.payerName);
+  if(r.pdfUrl) lines.push('PDF: ' + r.pdfUrl);
+  return lines.join('\n');
+}
+var lastRequest = null;
+function requestSummaryText(){
+  var r = lastRequest; if(!r) return '';
+  var co = COMPANIES[r.company] || {};
+  var lines = [
+    '📝 ขอเบิก ' + r.id,
+    (co.short || r.company) + ' · ' + r.reqName + (r.reqRole ? ' ('+r.reqRole+')' : ''),
+    r.purpose,
+    'จำนวน ' + money(r.amount) + ' บาท',
+    'จ่ายให้ ' + r.payee + (r.payeeBank ? ' · ' + r.payeeBank : '')
+  ];
+  if(r.needBy) lines.push('ต้องใช้ภายใน ' + thDate(r.needBy));
+  lines.push('กดอนุมัติที่ ' + location.origin + location.pathname + '#list');
+  return lines.join('\n');
+}
+
+/* ---------- บันทึกทันทีจากคำขอ ---------- */
+function openQuick(r){
+  state.modal={kind:'quick',row:r};
+  $('qSub').textContent=r.id+' · '+money(r.amount)+' บาท · '+r.purpose+' · จ่ายให้ '+r.payee;
+  var hasSlip = r.slipList && r.slipList.length;
+  $('qSlipHint').textContent = hasSlip ? '(มีแล้ว '+r.slipList.length+' ไฟล์ แนบเพิ่มได้)' : '(ยังไม่มี — ควรแนบ)';
+  state.qBills=[]; state.qSlips=[]; renderThumbs('qBills','thumbsQBill'); renderThumbs('qSlips','thumbsQSlip');
+  $('qNote').value=''; $('qErr').className='msg'; $('qDocType').value='NONE'; $('qReasonWrap').classList.remove('hide'); $('qOk').textContent='บันทึกและออกใบรับรอง';
+  if(!$('qName').value) $('qName').value = localStorage.getItem('acc_name')||'';
+  $('qmodal').classList.add('on'); $('qName').focus();
+}
+function closeQuick(){ $('qmodal').classList.remove('on'); state.modal=null; }
+function confirmQuick(){
+  var m=state.modal; if(!m||m.kind!=='quick') return;
+  var name=$('qName').value.trim(), e=$('qErr'); e.className='msg';
+  if(!name){ e.textContent='ใส่ชื่อผู้บันทึก'; e.className='msg err'; return; }
+  try{ localStorage.setItem('acc_name',name); }catch(x){}
+  var pack=function(a){ return a.map(function(f){ return {name:f.name,mime:f.mime,data:f.data}; }); };
+  var qdt=$('qDocType').value;
+  $('qOk').disabled=true; $('load').classList.add('on'); $('loadT').textContent='กำลังบันทึก';
+  if(qdt!=='NONE' && !state.qBills.length){ e.textContent='เลือกว่ามีใบเสร็จ/ใบกำกับ ต้องแนบรูปเอกสารด้วย'; e.className='msg err'; return; }
+  post({action:'quickRecord', id:m.row.id, by:name, reason:$('qReason').value, docType:qdt, docTypeLabel:$('qDocType').options[$('qDocType').selectedIndex].text.replace(/ → .*$/,''), note:$('qNote').value.trim(), bills:pack(state.qBills), slips:pack(state.qSlips)}, function(res){
+    $('qOk').disabled=false; $('load').classList.remove('on');
+    if(!res||!res.ok){ e.textContent=res&&res.error?res.error:'ไม่สำเร็จ'; e.className='msg err'; return; }
+    if(COMPANIES[m.row.company]){ state.company=m.row.company; syncCompany(); }
+    var rr=m.row;
+    lastRecord = { company:rr.company, expDate:(rr.paidAt||'').slice(0,10)||todayISO(), payeeName:rr.payee,
+      items:[{desc:rr.purpose,qty:1}], category:rr.category, fundType:'COMPANY', payMethod:'โอนเงิน',
+      docType:qdt, docTypeLabel:$('qDocType').options[$('qDocType').selectedIndex].text.replace(/ → .*$/,''),
+      advPerson:'', reqId:rr.id, payerName:name,
+      billCount:state.qBills.length, slipCount:state.qSlips.length + ((rr.slipList||[]).length) };
+    closeQuick();
+    $('rqView').classList.add('hide'); $('rqBarEl').classList.add('hide'); $('listView').classList.add('hide'); $('auditView').classList.add('hide');
+    onDone(res);
+  }, function(msg){ $('qOk').disabled=false; $('load').classList.remove('on'); e.textContent=msg; e.className='msg err'; });
+}
+
+/* ---------- ตรวจเอกสาร ---------- */
+function loadAudit(){
+  $('auditList').innerHTML='<div class="empty">กำลังตรวจ…</div>'; $('auditSum').innerHTML='';
+  getJsonp({action:'audit'}, function(res){
+    if(!res||!res.ok){ $('auditList').innerHTML='<div class="empty">'+esc(res&&res.error?res.error:'โหลดไม่ได้')+'</div>'; return; }
+    state.audit=res.rows||res; renderAudit();
+  }, function(){ $('auditList').innerHTML='<div class="empty">โหลดข้อมูลไม่ได้ ลองใหม่</div>'; });
+}
+function renderAudit(){
+  var a=state.audit||{expenses:[],requests:[]};
+  var miss=a.expenses.filter(function(x){ return x.missing.length; });
+  var pend=a.expenses.filter(function(x){ return x.status==='รอเบิกคืน'; });
+  var pendSum=pend.reduce(function(t,x){ return t+(Number(x.total)||0); },0);
+  var open=a.requests.length;
+  $('auditSum').innerHTML=
+    '<div class="sumbox'+(miss.length?' bad':'')+'"><div class="k">เอกสารไม่ครบ</div><div class="v">'+miss.length+'</div></div>'+
+    '<div class="sumbox"><div class="k">รอเบิกคืน</div><div class="v">'+pend.length+'</div><div class="k">'+money(pendSum)+' บาท</div></div>'+
+    '<div class="sumbox"><div class="k">คำขอค้าง</div><div class="v">'+open+'</div></div>';
+  var L=$('auditList'); L.innerHTML='';
+  if(!miss.length && !pend.length && !open){ L.innerHTML='<div class="empty">เอกสารครบทุกรายการ 🎉</div>'; return; }
+
+  if(miss.length){
+    L.appendChild(secH('เอกสารไม่ครบ '+miss.length+' รายการ'));
+    miss.forEach(function(x){ L.appendChild(auditCard(x,true)); });
+  }
+  if(pend.length){
+    L.appendChild(secH('รอเบิกคืนพนักงาน '+pend.length+' รายการ · '+money(pendSum)+' บาท'));
+    var byP={}; pend.forEach(function(x){ var k=x.advPerson||'-'; byP[k]=(byP[k]||0)+(Number(x.total)||0); });
+    var d=document.createElement('div'); d.className='card';
+    d.innerHTML=Object.keys(byP).map(function(k){ return '<div class="trow"><span>'+esc(k)+'</span><span class="v">'+money(byP[k])+'</span></div>'; }).join('')+
+      '<div class="meta">เปลี่ยนสถานะเป็น "คืนแล้ว" ในชีทเมื่อโอนคืนเรียบร้อย</div>';
+    L.appendChild(d);
+    pend.filter(function(x){ return !x.missing.length; }).forEach(function(x){ L.appendChild(auditCard(x,false)); });
+  }
+  if(open){
+    L.appendChild(secH('คำขอเบิกที่ค้างอยู่ '+open+' รายการ'));
+    a.requests.forEach(function(r){
+      var st=STATUS[r.status]||{label:r.status,cls:'st-done'};
+      var d=document.createElement('div'); d.className='card';
+      d.innerHTML='<div class="top"><div><span class="id">'+esc(r.id)+'</span><span class="co-tag">'+esc((COMPANIES[r.company]||{}).short||r.company)+'</span>'+
+        '<div class="who">'+esc(r.reqName)+'</div><div class="desc">'+esc(r.purpose)+'</div></div>'+
+        '<div style="text-align:right"><div class="amt">'+money(r.amount)+'</div><span class="st '+st.cls+'">'+st.label+'</span></div></div>'+
+        '<div class="meta">ค้างมา '+r.days+' วัน'+(r.status==='PAID'?(r.hasSlip?' · มีสลิปแล้ว':' · <span class="tag tag-miss">ยังไม่มีสลิป</span>'):'')+'</div>';
+      var acts=document.createElement('div'); acts.className='acts';
+      acts.appendChild(mkBtn('ไปจัดการ','btn ghost',function(){ state.filter=r.status; showTab('list'); Array.prototype.forEach.call($('chips').children,function(o){ o.setAttribute('aria-pressed',o.dataset.f===r.status); }); }));
+      d.appendChild(acts); L.appendChild(d);
+    });
+  }
+}
+function secH(t){ var d=document.createElement('div'); d.className='sec-h'; d.textContent=t; return d; }
+function auditCard(x, showMissing){
+  var d=document.createElement('div'); d.className='card';
+  var tags=x.missing.map(function(m){ return '<span class="tag tag-miss">ขาด'+m+'</span>'; }).join('');
+  if(x.bills) tags+='<span class="tag tag-ok">บิล '+x.bills+'</span>';
+  if(x.slips) tags+='<span class="tag tag-ok">สลิป '+x.slips+'</span>';
+  if(x.docType && x.docType!=='ใบรับรองแทน') tags+='<span class="tag tag-ok">'+esc(x.docType)+'</span>';
+  if(x.status==='รอเบิกคืน') tags+='<span class="tag tag-wait">รอเบิกคืน'+(x.advPerson?' · '+esc(x.advPerson):'')+'</span>';
+  d.innerHTML='<div class="top"><div><span class="id">'+esc(x.docNo)+'</span><span class="co-tag">'+esc(String(x.company).replace('บริษัท ','').replace(' จำกัด',''))+'</span>'+
+    '<div class="who">'+esc(x.payee)+'</div><div class="desc">'+esc(x.desc)+'</div></div>'+
+    '<div style="text-align:right"><div class="amt">'+money(x.total)+'</div></div></div>'+
+    '<div class="meta">'+thDate(x.date)+' · '+esc(x.category)+' · '+esc(x.fund)+(x.method?' · '+esc(x.method):'')+' · บันทึกโดย '+esc(x.payer)+'<br>'+tags+
+    (x.pdfUrl?'<br><a href="'+esc(x.pdfUrl)+'" target="_blank" rel="noopener">เปิดใบรับรอง</a>':'')+'</div>';
+  if(showMissing){
+    var acts=document.createElement('div'); acts.className='acts';
+    acts.appendChild(mkBtn('แนบเพิ่ม','btn',function(){ openAttach(x); }));
+    d.appendChild(acts);
+  }
+  return d;
+}
+function openAttach(x){
+  state.modal={kind:'attach',row:x};
+  $('aSub').textContent=(x.docNo||x.reqId)+' · '+money(x.total)+' บาท · '+x.payee+' — ขาด'+x.missing.join('+');
+  $('aBillWrap').classList.toggle('hide', !!x.slipOnly);
+  state.aBills=[]; state.aSlips=[]; renderThumbs('aBills','thumbsABill'); renderThumbs('aSlips','thumbsASlip');
+  $('aErr').className='msg';
+  if(!$('aName').value) $('aName').value = localStorage.getItem('acc_name')||'';
+  $('amodal').classList.add('on');
+}
+function closeAttach(){ $('amodal').classList.remove('on'); state.modal=null; }
+function confirmAttach(){
+  var m=state.modal; if(!m||m.kind!=='attach') return;
+  var e=$('aErr'); e.className='msg';
+  if(!state.aBills.length && !state.aSlips.length){ e.textContent='แนบไฟล์อย่างน้อย 1 ไฟล์'; e.className='msg err'; return; }
+  var pack=function(a){ return a.map(function(f){ return {name:f.name,mime:f.mime,data:f.data}; }); };
+  $('aOk').disabled=true;
+  post({action:'attachDocs', docNo:m.row.docNo||'', reqId:m.row.reqId||'', by:$('aName').value.trim(), bills:pack(state.aBills), slips:pack(state.aSlips)}, function(res){
+    $('aOk').disabled=false;
+    if(!res||!res.ok){ e.textContent=res&&res.error?res.error:'ไม่สำเร็จ'; e.className='msg err'; return; }
+    closeAttach(); if(state.tab==='list') loadList(); else loadAudit();
+  }, function(msg){ $('aOk').disabled=false; e.textContent=msg; e.className='msg err'; });
 }
 
 /* ---------- init ---------- */
@@ -1091,6 +1424,15 @@ function confirmModal(){
   $('items').appendChild(itemRow());
   $('addItem').onclick=function(){ $('items').appendChild(itemRow()); };
   ['shipping','discount','vatMode'].forEach(function(id){ $(id).addEventListener('input', calc); $(id).addEventListener('change', calc); });
+  window.syncDocType=function(){
+    var t=$('docType').value, need=(t==='NONE');
+    $('reasonWrap').classList.toggle('hide', !need);
+    $('docRefWrap').classList.toggle('hide', need);
+    $('docTypeHint').textContent = need ? 'ระบบจะสร้าง PDF ใบรับรองแทนใบเสร็จรับเงินให้' : 'ไม่ออกใบรับรองแทน · บันทึกและเก็บรูปเอกสารเป็นหลักฐาน';
+    $('billLabel').innerHTML = need ? 'บิล / ใบส่งของ / ใบกำกับภาษีที่ได้มา' : 'รูป'+$('docType').options[$('docType').selectedIndex].text.replace(/ → .*$/,'')+' <span class="req">*</span>';
+    $('submitBtn').textContent = need ? 'บันทึกและออกใบรับรอง' : 'บันทึกค่าใช้จ่าย';
+  };
+  $('docType').onchange=syncDocType; syncDocType();
   $('reason').onchange=function(){ $('reasonOtherWrap').classList.toggle('hide', this.value!=='__other'); };
   bindFund();
   bindDrop('dropBill','fileBill','bills','thumbsBill');
@@ -1111,12 +1453,27 @@ function confirmModal(){
   $('refreshBtn').onclick=loadList;
   $('mCancel').onclick=closeModal; $('mOk').onclick=confirmModal;
   $('modal').addEventListener('click',function(e){ if(e.target===$('modal')) closeModal(); });
+  bindDrop('dropMSlip','fileMSlip','mSlips','thumbsMSlip');
+  bindDrop('dropQBill','fileQBill','qBills','thumbsQBill');
+  bindDrop('dropQSlip','fileQSlip','qSlips','thumbsQSlip');
+  bindDrop('dropABill','fileABill','aBills','thumbsABill');
+  bindDrop('dropASlip','fileASlip','aSlips','thumbsASlip');
+  $('qCancel').onclick=closeQuick; $('qOk').onclick=confirmQuick;
+  $('qDocType').onchange=function(){ var n=this.value==='NONE'; $('qReasonWrap').classList.toggle('hide',!n); $('qOk').textContent = n ? 'บันทึกและออกใบรับรอง' : 'บันทึกค่าใช้จ่าย'; };
+  $('qmodal').addEventListener('click',function(e){ if(e.target===$('qmodal')) closeQuick(); });
+  $('aCancel').onclick=closeAttach; $('aOk').onclick=confirmAttach;
+  $('amodal').addEventListener('click',function(e){ if(e.target===$('amodal')) closeAttach(); });
+  $('auditRefresh').onclick=loadAudit;
+  $('rShareLine').onclick=function(){ shareLine(recordSummaryText()); };
+  $('rCopy').onclick=function(){ copyText(recordSummaryText(), this); };
+  $('rqShareLine').onclick=function(){ shareLine(requestSummaryText()); };
 
   /* ---- เปิดหน้าตามลิงก์ ---- */
   var m=location.search.match(/[?&]req=([^&]+)/);
   if(m && API_URL){ showTab('record'); loadRequest(decodeURIComponent(m[1])); }
   else if(location.hash==='#list') showTab('list');
   else if(location.hash==='#request') showTab('request');
+  else if(location.hash==='#audit') showTab('audit');
 })();
 </script>
 </body>
